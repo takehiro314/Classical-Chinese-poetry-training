@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f6f5f">
+  <title>漢文トレーニング</title>
+  <link rel="icon" href="icon.png">
+  <style>
+    :root {
+      --bg: #f6f3ea;
+      --paper: #fffdf7;
+      --ink: #20201d;
+      --muted: #6d6a60;
+      --line: #ded7c8;
+      --brand: #1f6f5f;
+      --brand-2: #e8f3ef;
+      --accent: #c15d36;
+      --bad: #b33d3d;
+      --good: #267447;
+      --shadow: 0 12px 28px rgba(47, 42, 30, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(255,255,255,.65), rgba(255,255,255,.65)),
+        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(72,96,120,.08) 28px),
+        repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(72,96,120,.08) 28px),
+        var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1040px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0 18px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      color: white;
+      background: var(--brand);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 0 14px;
+      color: white;
+      background: var(--brand);
+      font-weight: 700;
+    }
+
+    .btn.secondary {
+      color: var(--ink);
+      background: #ebe5d7;
+    }
+
+    .btn.ghost {
+      color: var(--brand);
+      background: transparent;
+      border: 1px solid var(--line);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mode-card, .panel, .question, .result-row {
+      background: rgba(255, 253, 247, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .mode-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 178px;
+      padding: 18px;
+      text-align: left;
+      color: var(--ink);
+    }
+
+    .mode-card strong {
+      display: block;
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    .mode-card span {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .mode-card em {
+      margin-top: auto;
+      color: var(--brand);
+      font-style: normal;
+      font-weight: 800;
+      padding-top: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+
+    .check-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 6px;
+    }
+
+    .check-row label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .practice-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meter {
+      flex: 1;
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e9e1d2;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--brand);
+      transition: width .2s ease;
+    }
+
+    .question {
+      padding: 18px;
+    }
+
+    .kanbun {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+      font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+      font-size: clamp(1.6rem, 7vw, 3.2rem);
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .char-tile {
+      min-width: 1.45em;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 7px 5px;
+      text-align: center;
+      position: relative;
+    }
+
+    .char-tile.selectable {
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    .char-tile.selectable.selected {
+      color: var(--brand);
+      border-color: var(--brand);
+      background: var(--brand-2);
+      transform: translateY(-2px);
+    }
+
+    .mark-select {
+      display: block;
+      width: 100%;
+      min-width: 56px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      font-size: .9rem;
+      background: white;
+    }
+
+    .order-select {
+      display: block;
+      width: 100%;
+      min-width: 64px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      font-size: .88rem;
+      background: white;
+    }
+
+    .annotated .char-tile {
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+
+    .char-tile sup, .char-tile sub {
+      position: absolute;
+      color: var(--accent);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .char-tile sup {
+      top: 4px;
+      right: 5px;
+      font-size: .45em;
+    }
+
+    .char-tile sub {
+      left: 5px;
+      bottom: 5px;
+      font-size: .38em;
+    }
+
+    .reading-over {
+      color: var(--muted);
+      font-size: clamp(.88rem, 3vw, 1.05rem);
+      letter-spacing: 0;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .choice {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      padding: 10px;
+      text-align: left;
+    }
+
+    .choice.selected {
+      border-color: var(--brand);
+      background: var(--brand-2);
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .answer-box {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .hint-line {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    .feedback {
+      display: none;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      line-height: 1.65;
+      background: #f2eee5;
+    }
+
+    .feedback.good {
+      display: block;
+      color: var(--good);
+      background: #eaf6ee;
+    }
+
+    .feedback.bad {
+      display: block;
+      color: var(--bad);
+      background: #f8eaea;
+    }
+
+    .question-actions, .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .history {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .result-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      box-shadow: none;
+    }
+
+    .rate {
+      font-weight: 900;
+      color: var(--brand);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 760px) {
+      .app { padding: 12px; }
+      header {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .top-actions { justify-content: flex-start; }
+      .grid, .settings, .choice-grid {
+        grid-template-columns: 1fr;
+      }
+      .mode-card { min-height: auto; }
+      .panel-head {
+        flex-direction: column;
+      }
+      .kanbun {
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="logo">漢</div>
+        <div>
+          <h1>漢文トレーニング</h1>
+          <p class="sub">返り点・置き字・再読文字・白文を短時間で確認</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost" id="reloadData">CSV再読込</button>
+        <button class="btn secondary" id="clearHistory">履歴削除</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="home" class="screen active">
+        <div class="grid" id="modeGrid"></div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-head">
+            <div>
+              <h2>リザルト</h2>
+              <p class="sub">各モードの過去20回分を端末内に保存します。</p>
+            </div>
+          </div>
+          <div class="history" id="historyList"></div>
+        </div>
+      </section>
+
+      <section id="settings" class="screen">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 id="settingsTitle">設定</h2>
+              <p class="sub" id="settingsDesc"></p>
+            </div>
+            <button class="btn secondary" data-nav="home">戻る</button>
+          </div>
+          <div class="settings">
+            <label>
+              問題数
+              <select id="questionCount">
+                <option value="5">5問</option>
+                <option value="10" selected>10問</option>
+                <option value="20">20問</option>
+              </select>
+            </label>
+            <label id="levelWrap">
+              レベル
+              <select id="level">
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+              </select>
+            </label>
+            <label>
+              出題順
+              <select id="order">
+                <option value="shuffle" selected>ランダム</option>
+                <option value="list">CSV順</option>
+              </select>
+            </label>
+          </div>
+          <div id="hakubunOptions" style="display:none; margin-top:14px">
+            <p class="small">白文モードで表示する補助</p>
+            <div class="check-row">
+              <label><input type="checkbox" value="kaeriten"> 返り点</label>
+              <label><input type="checkbox" value="reading"> 読み仮名</label>
+              <label><input type="checkbox" value="okurigana"> 送り仮名</label>
+              <label><input type="checkbox" value="punctuation"> 句読点</label>
+            </div>
+          </div>
+          <div class="question-actions">
+            <button class="btn" id="startPractice">演習開始</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="practice" class="screen">
+        <div class="panel">
+          <div class="practice-bar">
+            <button class="btn secondary" data-nav="home">終了</button>
+            <div class="meter"><span id="progress"></span></div>
+            <strong id="counter">1/10</strong>
+          </div>
+          <div id="questionMount" class="question"></div>
+        </div>
+      </section>
+
+      <section id="result" class="screen">
+        <div class="panel">
+          <h2>結果</h2>
+          <p class="sub" id="resultSummary"></p>
+          <div class="history" id="resultDetail"></div>
+          <div class="result-actions">
+            <button class="btn" id="retrySame">同じ設定でもう一度</button>
+            <button class="btn secondary" data-nav="home">メインへ</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const FALLBACK_DATA = [
+      {id:"001", text:"鳥語花香", reading:"ちょうごかこう", kaeriten:"", okurigana:"", punctuation:"鳥語、花香し", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"鳥が鳴き、花が香る。春の美しい景色。"},
+      {id:"002", text:"天朗気清", reading:"てんろうきせい", kaeriten:"", okurigana:"", punctuation:"天朗らかに、気清し", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"空が晴れ、空気が澄んでいる。"},
+      {id:"003", text:"大器晩成", reading:"たいきばんせい", kaeriten:"", okurigana:"", punctuation:"大器は晩成す", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"大人物は時間をかけて完成する。"},
+      {id:"004", text:"転禍為福", reading:"かをてんじてふくとなす", kaeriten:"禍:下,為:上", okurigana:"禍を転じて福と為す", punctuation:"禍を転じて、福と為す", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"災いをうまく利用して幸いに変える。"},
+      {id:"005", text:"少年易老学難成", reading:"しょうねんおいやすくがくなりがたし", kaeriten:"老:レ,成:レ", okurigana:"少年老い易く学成り難し", punctuation:"少年老い易く、学成り難し", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"若い時はすぐ過ぎ、学問はなかなか完成しない。"},
+      {id:"006", text:"人不学不知道", reading:"ひとまなばざればみちをしらず", kaeriten:"不:レ,不:レ", okurigana:"人学ばざれば道を知らず", punctuation:"人学ばざれば、道を知らず", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"人は学ばなければ道理を知らない。"},
+      {id:"007", text:"懸羊頭売狗肉", reading:"ようとうをかかげてくにくをうる", kaeriten:"頭:レ,肉:レ", okurigana:"羊頭を懸げて狗肉を売る", punctuation:"羊頭を懸げて、狗肉を売る", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"見かけと中身が違うこと。"},
+      {id:"008", text:"百聞不如一見", reading:"ひゃくぶんはいっけんにしかず", kaeriten:"不:二,如:一", okurigana:"百聞は一見に如かず", punctuation:"百聞は、一見に如かず", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"何度聞くより一度見る方がよく分かる。"},
+      {id:"009", text:"吾日三省吾身", reading:"われひにみたびわがみをかえりみる", kaeriten:"身:レ", okurigana:"吾日に三たび吾が身を省みる", punctuation:"吾日に三たび、吾が身を省みる", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"毎日何度も自分を反省する。"},
+      {id:"010", text:"君子恥其言之過其行", reading:"くんしはそのげんのおこないにすぐるをはず", kaeriten:"過:レ", okurigana:"君子は其の言の其の行ひに過ぐるを恥づ", punctuation:"君子は、其の言の其の行ひに過ぐるを恥づ", okiji:"之", okiji_reason:"連体修飾を作る助字", saidoku:"", saidoku_reading:"", meaning:"立派な人は言葉が行動を越えることを恥じる。"},
+      {id:"011", text:"君子不以言挙人不以人廃言", reading:"くんしはげんをもってひとをあげずひとをもってげんをはいせず", kaeriten:"不:レ,以:二,言:一,不:レ,以:二,人:一", okurigana:"君子は言を以て人を挙げず、人を以て言を廃せず", punctuation:"君子は言を以て人を挙げず、人を以て言を廃せず", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"言葉だけで人を評価せず、人によって言葉を退けない。"},
+      {id:"012", text:"悪称人之悪者", reading:"ひとのあくをしょうするをにくむ", kaeriten:"称:レ,者:レ", okurigana:"人の悪を称する者を悪む", punctuation:"人の悪を称する者を、悪む", okiji:"之", okiji_reason:"連体修飾を作る助字", saidoku:"", saidoku_reading:"", meaning:"他人の悪事を言い立てる者を憎む。"},
+      {id:"013", text:"不為児孫買美田", reading:"じそんのためにびでんをかわず", kaeriten:"不:レ,為:二,孫:一,買:レ", okurigana:"児孫の為に美田を買はず", punctuation:"児孫の為に、美田を買はず", okiji:"", okiji_reason:"", saidoku:"", saidoku_reading:"", meaning:"子孫に財産を残しすぎない。"},
+      {id:"014", text:"良薬苦於口", reading:"りょうやくはくちににがし", kaeriten:"於:レ", okurigana:"良薬は口に苦し", punctuation:"良薬は口に苦し", okiji:"於", okiji_reason:"場所・対象を示す置き字", saidoku:"", saidoku_reading:"", meaning:"役に立つ忠告は聞きづらい。"},
+      {id:"015", text:"青取之於藍", reading:"あおはこれをあいよりとる", kaeriten:"取:レ,於:レ", okurigana:"青は之を藍より取る", punctuation:"青は之を藍より取りて", okiji:"於", okiji_reason:"起点を示す置き字", saidoku:"", saidoku_reading:"", meaning:"弟子が師より優れることのたとえ。"},
+      {id:"016", text:"不信於朋友", reading:"ほうゆうにしんぜられず", kaeriten:"不:レ,於:レ", okurigana:"朋友に信ぜられず", punctuation:"朋友に信ぜられず", okiji:"於", okiji_reason:"受身の相手を示す置き字", saidoku:"", saidoku_reading:"", meaning:"友人から信用されない。"},
+      {id:"017", text:"過而不改是謂過矣", reading:"あやまちてあらためざるこれをあやまちという", kaeriten:"不:レ,謂:レ", okurigana:"過ちて改めざる、是を過ちと謂ふ", punctuation:"過ちて改めざる、是を過ちと謂ふ", okiji:"而,矣", okiji_reason:"而は接続、矣は文末の助字", saidoku:"", saidoku_reading:"", meaning:"過ちを改めないことこそ本当の過ちである。"},
+      {id:"018", text:"心不在焉視而不見", reading:"こころここにあらざればみれどもみえず", kaeriten:"不:レ,而:レ,不:レ", okurigana:"心焉に在らざれば、視れども見えず", punctuation:"心焉に在らざれば、視れども見えず", okiji:"焉,而", okiji_reason:"焉は指示・文末、而は接続の助字", saidoku:"", saidoku_reading:"", meaning:"心がそこになければ、見ても見えていない。"},
+      {id:"019", text:"三人行必有我師焉", reading:"さんにんおこなえばかならずわがしあり", kaeriten:"有:レ", okurigana:"三人行けば必ず我が師有り", punctuation:"三人行けば、必ず我が師有り", okiji:"焉", okiji_reason:"文末の語気を表す助字", saidoku:"", saidoku_reading:"", meaning:"誰からでも学ぶ点はある。"},
+      {id:"020", text:"未知生焉知死", reading:"いまだせいをしらずいずくんぞしをしらん", kaeriten:"未:レ,焉:レ", okurigana:"未だ生を知らず、焉んぞ死を知らん", punctuation:"未だ生を知らず、焉んぞ死を知らん", okiji:"", okiji_reason:"", saidoku:"未", saidoku_reading:"いまだ...ず", meaning:"生を知らないのに、どうして死が分かるだろうか。"},
+      {id:"021", text:"不知老将至", reading:"おいのまさにいたらんとするをしらず", kaeriten:"不:レ,将:レ", okurigana:"老いの将に至らんとするを知らず", punctuation:"老いの将に至らんとするを知らず", okiji:"", okiji_reason:"", saidoku:"将", saidoku_reading:"まさに...んとす", meaning:"老いが近づいていることにも気づかない。"},
+      {id:"022", text:"及時当勉励", reading:"ときにおよんでまさにつとめはげむべし", kaeriten:"当:レ", okurigana:"時に及んで当に勉励すべし", punctuation:"時に及んで、当に勉励すべし", okiji:"", okiji_reason:"", saidoku:"当", saidoku_reading:"まさに...べし", meaning:"よい時機を逃さず努力すべきである。"},
+      {id:"023", text:"過猶不及", reading:"すぎたるはなおおよばざるがごとし", kaeriten:"不:レ", okurigana:"過ぎたるは猶ほ及ばざるがごとし", punctuation:"過ぎたるは、猶ほ及ばざるがごとし", okiji:"", okiji_reason:"", saidoku:"猶", saidoku_reading:"なお...ごとし", meaning:"やりすぎは足りないのと同じくらいよくない。"},
+      {id:"024", text:"唯仁者宜在高位", reading:"ただじんしゃのみよろしくこういにあるべし", kaeriten:"宜:レ", okurigana:"唯仁者のみ宜しく高位に在るべし", punctuation:"唯仁者のみ、宜しく高位に在るべし", okiji:"", okiji_reason:"", saidoku:"宜", saidoku_reading:"よろしく...べし", meaning:"仁のある者こそ高い地位にいるべきである。"},
+      {id:"025", text:"人生得意須尽歓", reading:"じんせいいをえなばすべからくかんをつくすべし", kaeriten:"須:レ", okurigana:"人生意を得なば須く歓を尽くすべし", punctuation:"人生意を得なば、須く歓を尽くすべし", okiji:"", okiji_reason:"", saidoku:"須", saidoku_reading:"すべからく...べし", meaning:"人生で思いがかなう時は、十分に楽しむべきである。"}
+    ];
+
+    const MODES = {
+      kaeriten: {
+        name: "返り点モード",
+        desc: "漢字ごとに読む順番を選んで確認します。",
+        card: "返り点を見て読む順番を判定"
+      },
+      okiji: {
+        name: "置き字モード",
+        desc: "Level 1は置き字を選択、Level 2は働きも答えます。",
+        card: "読まない字と働きを判定"
+      },
+      saidoku: {
+        name: "再読文字モード",
+        desc: "Level 1は再読文字を選択、Level 2は読み方も答えます。",
+        card: "未・将・当・宜などを判定"
+      },
+      hakubun: {
+        name: "白文モード",
+        desc: "補助表示を選び、読みを入力して答えます。",
+        card: "白文から読みを組み立てる"
+      }
+    };
+
+    const READ_ORDERS = {
+      "004": "2,1,4,3",
+      "005": "1,2,4,3,5,7,6",
+      "006": "1,3,2,6,5,4",
+      "007": "2,1,4,3,6,5",
+      "008": "1,2,5,4,3,6",
+      "009": "1,2,3,6,4,5",
+      "010": "1,2,9,3,4,5,8,6,7",
+      "011": "1,2,7,4,3,6,5,12,9,8,11,10",
+      "012": "6,4,1,2,3,5",
+      "013": "7,3,1,2,6,4,5",
+      "014": "1,2,4,0,3",
+      "015": "1,4,2,0,3",
+      "016": "4,3,0,1,2",
+      "017": "1,0,3,2,4,6,5,0",
+      "018": "1,4,3,2,5,0,7,6",
+      "019": "1,2,3,4,7,5,6,0",
+      "020": "1,3,2,4,6,5",
+      "021": "5,4,1,2,3",
+      "022": "2,1,3,4,5",
+      "023": "1,2,4,3",
+      "024": "1,2,3,4,7,5,6",
+      "025": "1,2,4,3,5,7,6"
+    };
+
+    const state = {
+      data: [],
+      mode: null,
+      settings: {},
+      questions: [],
+      index: 0,
+      answers: []
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function normalizeText(value) {
+      return String(value || "")
+        .normalize("NFKC")
+        .replace(/[、。，．・\s]/g, "")
+        .replace(/ゐ/g, "い")
+        .replace(/ゑ/g, "え")
+        .replace(/は/g, "わ")
+        .replace(/を/g, "お")
+        .toLowerCase();
+    }
+
+    function parseCsv(csvText) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let i = 0; i < csvText.length; i++) {
+        const ch = csvText[i];
+        const next = csvText[i + 1];
+        if (quoted && ch === '"' && next === '"') {
+          cell += '"';
+          i++;
+        } else if (ch === '"') {
+          quoted = !quoted;
+        } else if (!quoted && ch === ",") {
+          row.push(cell);
+          cell = "";
+        } else if (!quoted && (ch === "\n" || ch === "\r")) {
+          if (ch === "\r" && next === "\n") i++;
+          row.push(cell);
+          if (row.some((item) => item.trim() !== "")) rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+
+      row.push(cell);
+      if (row.some((item) => item.trim() !== "")) rows.push(row);
+      if (!rows.length) return [];
+
+      const headers = rows.shift().map((h) => h.trim());
+      return rows.map((cells) => {
+        const item = {};
+        headers.forEach((header, i) => item[header] = (cells[i] || "").trim());
+        return item;
+      });
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch("kanshi.csv", {cache: "no-store"});
+        if (!response.ok) throw new Error("CSV not found");
+        const csvData = parseCsv(await response.text());
+        state.data = csvData.length ? csvData : FALLBACK_DATA;
+      } catch {
+        state.data = FALLBACK_DATA;
+      }
+      state.data = state.data.map((item) => ({
+        ...item,
+        read_order: item.read_order || READ_ORDERS[item.id] || naturalOrder(item.text)
+      }));
+      renderHome();
+    }
+
+    function showScreen(id) {
+      $$(".screen").forEach((screen) => screen.classList.toggle("active", screen.id === id));
+    }
+
+    function renderHome() {
+      const grid = $("#modeGrid");
+      grid.innerHTML = Object.entries(MODES).map(([key, mode]) => `
+        <button class="mode-card" data-mode="${key}">
+          <strong>${mode.name}</strong>
+          <span>${mode.card}</span>
+          <em>設定へ</em>
+        </button>
+      `).join("");
+      grid.querySelectorAll("[data-mode]").forEach((button) => {
+        button.addEventListener("click", () => openSettings(button.dataset.mode));
+      });
+      renderHistory();
+    }
+
+    function openSettings(mode) {
+      state.mode = mode;
+      $("#settingsTitle").textContent = MODES[mode].name;
+      $("#settingsDesc").textContent = MODES[mode].desc;
+      $("#levelWrap").style.display = mode === "okiji" || mode === "saidoku" ? "grid" : "none";
+      $("#hakubunOptions").style.display = mode === "hakubun" ? "block" : "none";
+      showScreen("settings");
+    }
+
+    function getFilteredData() {
+      if (state.mode === "okiji") return state.data.filter((item) => item.okiji);
+      if (state.mode === "saidoku") return state.data.filter((item) => item.saidoku);
+      if (state.mode === "kaeriten") return state.data.filter((item) => item.kaeriten);
+      return state.data;
+    }
+
+    function startPractice() {
+      const count = Number($("#questionCount").value);
+      const source = getFilteredData();
+      const ordered = $("#order").value === "shuffle" ? shuffle(source) : [...source];
+      state.settings = {
+        count,
+        level: $("#level").value,
+        aids: $$("#hakubunOptions input:checked").map((input) => input.value)
+      };
+      state.questions = ordered.slice(0, Math.min(count, ordered.length));
+      state.index = 0;
+      state.answers = [];
+      renderQuestion();
+      showScreen("practice");
+    }
+
+    function shuffle(items) {
+      const copied = [...items];
+      for (let i = copied.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copied[i], copied[j]] = [copied[j], copied[i]];
+      }
+      return copied;
+    }
+
+    function renderQuestion() {
+      const item = state.questions[state.index];
+      if (!item) return finishPractice();
+      $("#counter").textContent = `${state.index + 1}/${state.questions.length}`;
+      $("#progress").style.width = `${(state.index / state.questions.length) * 100}%`;
+      const mount = $("#questionMount");
+      const renderers = {
+        kaeriten: renderKaeritenQuestion,
+        okiji: renderOkijiQuestion,
+        saidoku: renderSaidokuQuestion,
+        hakubun: renderHakubunQuestion
+      };
+      mount.innerHTML = renderers[state.mode](item);
+      attachQuestionHandlers(item);
+    }
+
+    function charsHtml(item, selectable = false, marks = false) {
+      return [...item.text].map((char, i) => `
+        <div class="char-tile ${selectable ? "selectable" : ""}" data-char="${char}" data-index="${i}">
+          ${char}
+          ${marks ? `<select class="mark-select" aria-label="${char}の返り点">
+            <option value="">なし</option>
+            <option value="レ">レ</option>
+            <option value="一">一</option>
+            <option value="二">二</option>
+            <option value="上">上</option>
+            <option value="下">下</option>
+          </select>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function orderCharsHtml(item) {
+      const max = Math.max(...readOrderFor(item));
+      const options = [`<option value="">未選択</option>`, `<option value="0">×</option>`]
+        .concat(Array.from({length: max}, (_, i) => `<option value="${i + 1}">${i + 1}</option>`))
+        .join("");
+      return [...item.text].map((char, i) => `
+        <div class="char-tile" data-char="${char}" data-index="${i}">
+          ${char}
+          <select class="order-select" aria-label="${char}の読む順番">${options}</select>
+        </div>
+      `).join("");
+    }
+
+    function annotatedCharsHtml(item, aids) {
+      const markMap = kaeritenByIndex(item);
+      const okiji = splitList(item.okiji);
+      const saidoku = splitList(item.saidoku);
+      return [...item.text].map((char, i) => {
+        const sup = aids.includes("kaeriten") && markMap[i] ? `<sup>${markMap[i]}</sup>` : "";
+        const labels = [];
+        if (aids.includes("okurigana") && okiji.includes(char)) labels.push("置");
+        if (aids.includes("okurigana") && saidoku.includes(char)) labels.push("再");
+        const sub = labels.length ? `<sub>${labels.join("/")}</sub>` : "";
+        return `<div class="char-tile" data-char="${char}" data-index="${i}">${sup}${char}${sub}</div>`;
+      }).join("");
+    }
+
+    function renderKaeritenQuestion(item) {
+      return `
+        <h2>読む順番を選ぶ</h2>
+        <p class="hint-line">${item.meaning}</p>
+        <div class="kanbun">${orderCharsHtml(item)}</div>
+        <p class="small">読まない字は「×」を選びます。</p>
+        <div class="feedback" id="feedback"></div>
+        <div class="question-actions">
+          <button class="btn" id="checkAnswer">採点</button>
+          <button class="btn secondary" id="nextQuestion" style="display:none">次へ</button>
+        </div>
+      `;
+    }
+
+    function renderOkijiQuestion(item) {
+      const choices = buildChoices(item.okiji_reason, ["連体修飾を作る助字", "場所・対象を示す置き字", "起点を示す置き字", "受身の相手を示す置き字", "接続・文末の助字"]);
+      return `
+        <h2>置き字を選ぶ</h2>
+        <p class="hint-line">読み: ${item.reading}</p>
+        <div class="kanbun">${charsHtml(item, true, false)}</div>
+        ${state.settings.level === "2" ? reasonChoices(choices) : ""}
+        <div class="feedback" id="feedback"></div>
+        <div class="question-actions">
+          <button class="btn" id="checkAnswer">採点</button>
+          <button class="btn secondary" id="nextQuestion" style="display:none">次へ</button>
+        </div>
+      `;
+    }
+
+    function renderSaidokuQuestion(item) {
+      const choices = buildChoices(item.saidoku_reading, ["いまだ...ず", "まさに...んとす", "まさに...べし", "よろしく...べし", "すべからく...べし", "なお...ごとし"]);
+      return `
+        <h2>再読文字を選ぶ</h2>
+        <p class="hint-line">書き下し: ${item.okurigana}</p>
+        <div class="kanbun">${charsHtml(item, true, false)}</div>
+        ${state.settings.level === "2" ? reasonChoices(choices) : ""}
+        <div class="feedback" id="feedback"></div>
+        <div class="question-actions">
+          <button class="btn" id="checkAnswer">採点</button>
+          <button class="btn secondary" id="nextQuestion" style="display:none">次へ</button>
+        </div>
+      `;
+    }
+
+    function renderHakubunQuestion(item) {
+      const aids = state.settings.aids;
+      const hints = [];
+      if (aids.includes("kaeriten")) hints.push("返り点は上付き表示");
+      if (aids.includes("reading")) hints.push("読み仮名はルビ表示");
+      if (aids.includes("okurigana")) hints.push(`書き下し: ${item.okurigana || item.punctuation}`);
+      if (aids.includes("punctuation")) hints.push(`句読点: ${item.punctuation}`);
+      const body = `${aids.includes("reading") ? `<div class="reading-over">${item.reading}</div>` : ""}${annotatedCharsHtml(item, aids)}`;
+      return `
+        <h2>読みを入力する</h2>
+        <div class="kanbun annotated">${body}</div>
+        <p class="hint-line">${hints.join(" / ") || "補助なし"}</p>
+        <div class="answer-box">
+          <label>読み<input id="typedAnswer" type="text" autocomplete="off" placeholder="例: ひゃくぶんはいっけんにしかず"></label>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="question-actions">
+          <button class="btn" id="checkAnswer">採点</button>
+          <button class="btn secondary" id="nextQuestion" style="display:none">次へ</button>
+        </div>
+      `;
+    }
+
+    function reasonChoices(choices) {
+      return `<div class="choice-grid">${choices.map((choice) => `
+        <button class="choice" data-choice="${choice}">${choice}</button>
+      `).join("")}</div>`;
+    }
+
+    function buildChoices(answer, defaults) {
+      const distractors = defaults.filter(Boolean).filter((value, index, array) => value !== answer && array.indexOf(value) === index);
+      return shuffle([answer, ...shuffle(distractors).slice(0, 3)].filter(Boolean));
+    }
+
+    function attachQuestionHandlers(item) {
+      $$(".char-tile.selectable").forEach((tile) => {
+        tile.addEventListener("click", () => tile.classList.toggle("selected"));
+      });
+      $$(".choice").forEach((choice) => {
+        choice.addEventListener("click", () => {
+          $$(".choice").forEach((button) => button.classList.remove("selected"));
+          choice.classList.add("selected");
+        });
+      });
+      $("#checkAnswer").addEventListener("click", () => checkAnswer(item));
+      $("#nextQuestion").addEventListener("click", () => {
+        state.index++;
+        renderQuestion();
+      });
+      const input = $("#typedAnswer");
+      if (input) input.focus();
+    }
+
+    function checkAnswer(item) {
+      const result = {
+        item,
+        correct: false,
+        detail: ""
+      };
+      if (state.mode === "kaeriten") {
+        result.correct = checkKaeriten(item);
+        result.detail = `正答: ${formatReadOrder(item)}`;
+      } else if (state.mode === "okiji") {
+        const selected = selectedChars();
+        const answerChars = splitList(item.okiji);
+        const selectedOkiji = sameSet(selected, answerChars);
+        const reasonOk = state.settings.level !== "2" || selectedChoice() === item.okiji_reason;
+        result.correct = selectedOkiji && reasonOk;
+        result.detail = `正答: ${item.okiji} / ${item.okiji_reason || "働き指定なし"}`;
+      } else if (state.mode === "saidoku") {
+        const selected = selectedChars();
+        const answerChars = splitList(item.saidoku);
+        const selectedSaidoku = sameSet(selected, answerChars);
+        const readingOk = state.settings.level !== "2" || selectedChoice() === item.saidoku_reading;
+        result.correct = selectedSaidoku && readingOk;
+        result.detail = `正答: ${item.saidoku} / ${item.saidoku_reading}`;
+      } else if (state.mode === "hakubun") {
+        const typed = $("#typedAnswer").value;
+        result.correct = normalizeText(typed) === normalizeText(item.reading);
+        result.detail = `正答: ${item.reading}`;
+      }
+      state.answers[state.index] = result;
+      showFeedback(result);
+    }
+
+    function checkKaeriten(item) {
+      const expected = readOrderFor(item);
+      return $$(".char-tile").every((tile) => {
+        const index = Number(tile.dataset.index);
+        const value = Number(tile.querySelector("select").value);
+        return expected[index] === value;
+      });
+    }
+
+    function readOrderFor(item) {
+      return String(item.read_order || naturalOrder(item.text)).split(",").map((value) => Number(value.trim()));
+    }
+
+    function naturalOrder(text) {
+      return [...String(text || "")].map((_, i) => i + 1).join(",");
+    }
+
+    function formatReadOrder(item) {
+      return [...item.text].map((char, i) => `${char}:${readOrderFor(item)[i] || "×"}`).join(" / ");
+    }
+
+    function kaeritenByIndex(item) {
+      const marks = splitList(item.kaeriten);
+      const used = new Set();
+      const map = {};
+      marks.forEach((pair) => {
+        const [target, mark] = pair.split(":");
+        const chars = [...item.text];
+        const index = chars.findIndex((char, i) => char === target && !used.has(i));
+        if (index >= 0) {
+          used.add(index);
+          map[index] = mark;
+        }
+      });
+      return map;
+    }
+
+    function splitList(value) {
+      return String(value || "").split(/[、,]/).map((v) => v.trim()).filter(Boolean);
+    }
+
+    function selectedChars() {
+      return $$(".char-tile.selected").map((tile) => tile.dataset.char);
+    }
+
+    function selectedChoice() {
+      return $(".choice.selected")?.dataset.choice || "";
+    }
+
+    function sameSet(a, b) {
+      if (a.length !== b.length) return false;
+      return a.every((item) => b.includes(item));
+    }
+
+    function showFeedback(result) {
+      const feedback = $("#feedback");
+      feedback.className = `feedback ${result.correct ? "good" : "bad"}`;
+      feedback.innerHTML = `${result.correct ? "正解" : "不正解"}<br>${result.detail}<br><span class="small">${result.item.meaning}</span>`;
+      $("#checkAnswer").style.display = "none";
+      $("#nextQuestion").style.display = "inline-flex";
+      $("#progress").style.width = `${((state.index + 1) / state.questions.length) * 100}%`;
+    }
+
+    function finishPractice() {
+      const total = state.answers.length;
+      const correct = state.answers.filter((answer) => answer.correct).length;
+      const rate = total ? Math.round(correct / total * 100) : 0;
+      saveHistory({mode: state.mode, correct, total, rate, date: new Date().toISOString()});
+      $("#resultSummary").textContent = `${MODES[state.mode].name}: ${correct}/${total}問 正解率${rate}%`;
+      $("#resultDetail").innerHTML = state.answers.map((answer, i) => `
+        <div class="result-row">
+          <div>
+            <strong>${i + 1}. ${answer.item.text}</strong>
+            <div class="small">${answer.detail}</div>
+          </div>
+          <span class="rate">${answer.correct ? "○" : "×"}</span>
+        </div>
+      `).join("");
+      showScreen("result");
+    }
+
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem("kanbunHistory") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(record) {
+      const next = [record, ...getHistory()].slice(0, 20);
+      localStorage.setItem("kanbunHistory", JSON.stringify(next));
+    }
+
+    function renderHistory() {
+      const history = getHistory();
+      $("#historyList").innerHTML = history.length ? history.map((record) => `
+        <div class="result-row">
+          <div>
+            <strong>${MODES[record.mode]?.name || record.mode}</strong>
+            <div class="small">${new Date(record.date).toLocaleString("ja-JP")} / ${record.correct}/${record.total}問</div>
+          </div>
+          <span class="rate">${record.rate}%</span>
+        </div>
+      `).join("") : `<p class="small">まだ履歴はありません。</p>`;
+    }
+
+    $$("[data-nav]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.dataset.nav === "home") renderHome();
+        showScreen(button.dataset.nav);
+      });
+    });
+    $("#startPractice").addEventListener("click", startPractice);
+    $("#retrySame").addEventListener("click", () => {
+      state.index = 0;
+      state.answers = [];
+      renderQuestion();
+      showScreen("practice");
+    });
+    $("#reloadData").addEventListener("click", loadData);
+    $("#clearHistory").addEventListener("click", () => {
+      localStorage.removeItem("kanbunHistory");
+      renderHistory();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
